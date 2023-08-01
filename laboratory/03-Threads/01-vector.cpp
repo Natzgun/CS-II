@@ -3,6 +3,7 @@
 #include <ctime>
 #include <chrono>
 #include <future>
+#include <thread>
 
 
 using namespace std;
@@ -106,7 +107,7 @@ int main () {
   std::cout << "Ejecución: " << duration << "ms" << std::endl; */
   
 
-  auto start = std::chrono::high_resolution_clock::now();
+  /* auto start = std::chrono::high_resolution_clock::now();
 
   future<int> maxFuture = async(launch::async, maxNumber, ref(randomIntegers));
   future<int> minFuture = async(launch::async, minNumber, ref(randomIntegers));
@@ -128,7 +129,33 @@ int main () {
   auto end = chrono::high_resolution_clock::now();
   auto duration = chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
-  std::cout << "Ejecución: " << duration << " ms" << endl;
+  std::cout << "Ejecución: " << duration << " ms" << endl; */
+auto start = std::chrono::high_resolution_clock::now();
+
+  // Create threads to run functions in parallel
+  std::thread maxThread(maxNumber, ref(randomIntegers));
+  std::thread minThread(minNumber, ref(randomIntegers));
+  std::thread promedioThread(promedio, ref(randomIntegers));
+  std::thread mostThread(mostNumber, ref(randomIntegers));
+  //std::thread multiplyThread(multiplyFive, ref(randomIntegers), std::ref(m5));
+
+  // Wait for the threads to finish
+  maxThread.join();
+  minThread.join();
+  promedioThread.join();
+  mostThread.join();
+  //multiplyThread.join();
+
+  // Print the results
+  cout << "Max: " << maxThread.get_id() << std::endl;
+  cout << "Min: " << minThread.get_id() << std::endl;
+  cout << "Promedio: " << promedioThread.get_id() << std::endl;
+  cout << "Most: " << mostThread.get_id() << std::endl;
+
+  auto end = std::chrono::high_resolution_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+
+  std::cout << "Ejecución: " << duration << " microsegundos" << std::endl;
   // print(randomIntegers);
 
   return 0;
